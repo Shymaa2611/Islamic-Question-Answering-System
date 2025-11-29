@@ -57,8 +57,8 @@ pip install -r requirements.txt
 !python src/PipelineA/Pipeline.py
 
 ```
+
  - RUN USING PIPELINE B
- - RUN USING PIPELINE A
  ```bash
 
 !python src/PipelineB/Pipeline.py
