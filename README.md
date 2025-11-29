@@ -6,3 +6,23 @@ The Islamic Question Answering System is designed to provide precise and context
 - Given a free-text question posed in MSA, a collection of Qur'anic passages (that cover the Holy Qur'an) and a collection of Hadiths from Sahih Bukhari, a system is required to retrieve a ranked list of up-to 20 answer-bearing Qur'anic passages or Hadiths (i.e., Islamic sources that potentially enclose the answer(s) to the given question) from the two collections. The question can be a factoid or non-factoid question. To make the task more realistic (thus challenging), some questions may not have an answer in the Holy Qur'an and Sahih Al-Bukhari. In such cases, the ideal system should return no answers; otherwise, it returns a ranked list of up to 20 answer-bearing sources.
 ## Answer Extraction:
 - Uses Gemini to extract accurate answers from the retrieved passages, supporting both fact-based and explanatory questions.
+
+# Pipeline A – CrossEncoder + Gemini
+- Overview: Pipeline A is a full question-answering system using a CrossEncoder for retrieval and Gemini for answer extraction.
+
+## Steps:
+
+- Retrieval: The CrossEncoder ranks Qur’anic and Hadith passages according to their relevance to the input MSA question, returning up to 20 candidate passages.
+
+- Answer Extraction: Gemini processes the retrieved passages to extract precise, context-aware answers.
+
+# Pipeline B – Gemini Retrieval + Gemini Extraction
+- Overview: Pipeline B is an end-to-end system where Gemini performs both retrieval and answer extraction.
+
+## Steps:
+
+- Retrieval: Gemini identifies relevant Qur’anic and Hadith passages directly from the collections, leveraging deep contextual understanding.
+
+- Answer Extraction: Gemini extracts the final answer from the retrieved passages.
+
+Features:
