@@ -1,17 +1,8 @@
 datasets==4.0.0
-faiss-cpu
-huggingface_hub==0.13.4
 pandas==2.3.1
 protobuf==6.31.1
 scikit_learn==1.7.1
-sentence_transformers==2.2.2
 torch==2.3.1
 tqdm==4.67.1
 transformers==4.54.1
 trectools==0.0.50
-google-generativeai
-google-genai
-
-
-
-
