@@ -25,7 +25,8 @@ The Islamic Question Answering System is designed to provide precise and context
 - Python 3.10
 - Gemini API
 - Additional libraries:
-``bash
+
+``` bash
 !pip install huggingface_hub==0.13.4
 !pip install -U sentence-transformers
 !pip install faiss-cpu
