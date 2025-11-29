@@ -51,3 +51,16 @@ pip install -r requirements.txt
 ```
 
 5- Run System:
+ - RUN USING PIPELINE A
+ ```bash
+
+!python src/PipelineA/Pipeline.py
+
+```
+ - RUN USING PIPELINE B
+ - RUN USING PIPELINE A
+ ```bash
+
+!python src/PipelineB/Pipeline.py
+
+```
