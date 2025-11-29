@@ -10,6 +10,7 @@ tqdm==4.67.1
 transformers==4.54.1
 trectools==0.0.50
 google-generativeai
+google-genai
 
 
 
