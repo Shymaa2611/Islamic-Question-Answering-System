@@ -19,4 +19,3 @@ The Islamic Question Answering System is designed to provide precise and context
 - Retrieval: Gemini identifies relevant Qur’anic and Hadith passages directly from the collections, leveraging deep contextual understanding.
 - Answer Extraction: Gemini extracts the final answer from the retrieved passages.
 
-Features:
