@@ -83,7 +83,7 @@ def search(query, k_quran=50, k_hadith=20):
     results = sorted(results, key=lambda x: x['score'], reverse=True)
     return results
 
-def predict_Question_rerank_with_QA(question, model, search_fn, all_passages, k_retrieve=70, score_threshold=0.15, max_returned=20):
+def predict_Question_rerank_with_QA(question, model, search_fn, all_passages, k_retrieve=70, score_threshold=0.15, max_returned=5):
     all_results = []
     retrieved = search_fn(question)
     candidate_texts = [r["text"] for r in retrieved]
@@ -111,7 +111,23 @@ def predict_Question_rerank_with_QA(question, model, search_fn, all_passages, k_
                 })
     return all_results
 
-query = "كيف نعبد الله؟"
-results = predict_Question_rerank_with_QA(query, model, search, all_passages)
-for r in results:
-    print(r)
+def template(query,new_context):
+     new_question = query
+     results = predict_Question_rerank_with_QA(query, model, search, all_passages)
+     few_shot_examples = ""
+     for r in results:
+        question = r.get("question", "")
+        context = r.get("text", "")
+        answer = r.get("answer", "")
+        
+        if question and context and answer: 
+            few_shot_examples += f"Question: {question}\nContext: {context}\nAnswer: {answer}\n\n"
+  
+     prompt = few_shot_examples + f"Question: {new_question}\nContext: {new_context}\nAnswer:"
+     return prompt
+
+
+
+
+
+
