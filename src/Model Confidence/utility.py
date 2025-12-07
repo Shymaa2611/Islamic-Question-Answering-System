@@ -21,7 +21,7 @@ import re
 import google.generativeai as genai
 import re
 from huggingface_hub import snapshot_download
-genai.configure(api_key="AIzaSyC59FWVuHXHvxbnLNRYJPXjw9bQtWCL5xM")
+genai.configure(api_key="AIzaSyA3tZN-iz6xa3vzZk2NdvuMTRlwzow0Tmw")
 snapshot_download(
     repo_id="SeragAmin/NAMAA-retriever-cosine-final_60-90",
     repo_type="model",
@@ -161,7 +161,7 @@ def predict_Question_rerank_crossencoder(question, model, search_fn, k_retrieve=
 
 def QA(question):
     candiated_passages=predict_Question_rerank_crossencoder(question, model, search_fn=search, k_retrieve=70)
-   # genai.configure(api_key="AIzaSyAq9XC0gM_UQ4Ra79kOD25LlC8kD9UoDDw")
+    genai.configure(api_key="AIzaSyA3tZN-iz6xa3vzZk2NdvuMTRlwzow0Tmw")
     model2 = genai.GenerativeModel("gemini-2.5-flash")
     context = "\n".join([f"Passage {i+1}: {p}" for i, p in enumerate(candiated_passages)])
     prompt = f"""
