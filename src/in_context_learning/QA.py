@@ -55,7 +55,7 @@ model = CrossEncoder("yoriis/GTE-tydi-quqa-haqa")
 diacritics_pattern = re.compile(r'[\u064B-\u0652\u0670]')
 
 quran_passages = []
-with open("QH-QA-25_Subtask2_QPC_v1.1.tsv", "r", encoding="utf-8") as f:
+with open("/content/Islamic-Question-Answering-System/data/QH-QA-25_Subtask2_QPC_v1.1.tsv", "r", encoding="utf-8") as f:
     for line in f:
         parts = line.strip().split("\t")
         if len(parts) >= 2:
@@ -64,7 +64,7 @@ with open("QH-QA-25_Subtask2_QPC_v1.1.tsv", "r", encoding="utf-8") as f:
             quran_passages.append({"text": passage_text, "source": "quran", "id": passage_id})
 
 hadith_passages = []
-with open("/content/IslamicEval2025/data/Task Data/data/Sahih-Bukhari/QH-QA-25_Subtask2_Sahih-Bukhari_v1.0.jsonl", "r", encoding="utf-8") as f:
+with open("/content/Islamic-Question-Answering-System/data/QH-QA-25_Subtask2_Sahih-Bukhari_v1.0.jsonl", "r", encoding="utf-8") as f:
     for line in f:
         try:
             item = ast.literal_eval(line.strip())

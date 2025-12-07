@@ -51,8 +51,8 @@ def load_passages_csv(file_path, source_name):
         })
     return passages
 
-quran_passages = load_passages_csv("/content/train_quqa.csv", "quran")
-hadith_passages = load_passages_csv("/content/haqa_train.csv", "hadith")
+quran_passages = load_passages_csv("/content/Islamic-Question-Answering-System/data/QUQA/train_quqa.csv", "quran")
+hadith_passages = load_passages_csv("/content/Islamic-Question-Answering-System/data/HAQA/haqa_train.csv", "hadith")
 all_passages = quran_passages + hadith_passages
 
 print(f"Total passages loaded: {len(all_passages)}")
