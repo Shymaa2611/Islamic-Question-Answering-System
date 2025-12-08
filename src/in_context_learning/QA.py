@@ -272,7 +272,7 @@ def clean_and_format(text):
     return text
 
 
-
+""" 
 
 #print(get_relevant_passages("اريد حديث عن عدم التحدث بسوء"))
 Questions=[
@@ -314,6 +314,6 @@ for question in Questions:
     print("الاجابة : ",answer)
     print("\n\n")
 
-
+ """
 
 
