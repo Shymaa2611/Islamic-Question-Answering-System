@@ -69,5 +69,8 @@ def main():
         F1_list.append(F1)
     print("EM",sum(Exact_match)/len(eval_data)*100 )
     print("F1 = ",sum(F1_list)/len(eval_data)*100)
+
+
+main()
         
 
