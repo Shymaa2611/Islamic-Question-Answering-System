@@ -1,7 +1,7 @@
 import json
 from src.in_context_learning.QA import QA
 
-with open("/content/tydiqa-goldp-v1.1-dev.json", "r", encoding="utf-8") as f:
+with open("/content/Islamic-Question-Answering-System/data/tydiqa-goldp-v1.1-dev.json", "r", encoding="utf-8") as f:
     data = json.load(f)
 
 eval_data = []
@@ -57,13 +57,17 @@ def compute_f1(prediction, truth):
 
 
 def main():
+    Exact_match=[]
+    F1_list=[]
     for item in eval_data:
         question=item['question']
         truth=item['answer']
         prediction=QA(question)
         EM=compute_exact_match(prediction, truth)
+        Exact_match.append(EM)
         F1=compute_f1(prediction, truth)
-        print("compute_exact_match = ", EM)
-        print("F1 = ",F1)
+        F1_list.append(F1)
+    print("EM",sum(Exact_match)/len(eval_data)*100 )
+    print("F1 = ",sum(F1_list)/len(eval_data)*100)
         
 
