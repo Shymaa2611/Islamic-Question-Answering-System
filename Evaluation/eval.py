@@ -71,6 +71,7 @@ def main():
     print("F1 = ",sum(F1_list)/len(eval_data)*100)
 
 
-main()
+if __name__=="main":
+  main()
         
 
