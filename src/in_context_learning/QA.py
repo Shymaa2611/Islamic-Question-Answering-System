@@ -229,7 +229,7 @@ def predict_Question_rerank_crossencoder(question, model, search_fn, k_retrieve=
 
 def QA(question):
     candiated_passages=predict_Question_rerank_crossencoder(question, model, search_fn=search, k_retrieve=70)
-    genai.configure(api_key="AIzaSyDTrq2WNd2uxAsJ9y6nQHbSvRHswFAmAZs")
+    genai.configure(api_key="AIzaSyBQYT-wo_y1ZmUbwgWkpwQmcp_z5ZZIkwM")
     model2 = genai.GenerativeModel("gemini-2.5-flash")
     context = "\n".join([f"Passage {i+1}: {p}" for i, p in enumerate(candiated_passages)])
     prompt=template(question,context)
