@@ -1,5 +1,4 @@
-api_key: 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
-url:https://openrouter.ai/models
+
 ========================================================
 // Results 
 In context learning
