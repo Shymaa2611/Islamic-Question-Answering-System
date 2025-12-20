@@ -1,77 +1,82 @@
+# ===== FIX matplotlib backend (MUST be first) =====
+import os
+os.environ["MPLBACKEND"] = "Agg"
+
+# ===== Imports =====
 import json
-from src.in_context_learning.QA import QA
+import string
+import pandas as pd
+from bert_score import BERTScorer
+from QA import QA
 
-with open("/content/Islamic-Question-Answering-System/data/tydiqa-goldp-v1.1-dev.json", "r", encoding="utf-8") as f:
-    data = json.load(f)
+# ===== Initialize BERTScore =====
+scorer = BERTScorer(
+    model_type="aubmindlab/bert-base-arabertv02",
+    num_layers=12,
+    lang="ar"
+)
 
-eval_data = []
-for item in data["data"]:
-    for paragraph in item["paragraphs"]:
-        context = paragraph["context"]
-        for qa in paragraph["qas"]:
-            question = qa["question"]
-            answer = qa["answers"][0]["text"] if qa["answers"] else ""
-            
-            eval_data.append({
-                "question": question,
-                "context": context,
-                "answer": answer
-            })
+# ===== Load CSV data =====
+def load_data_csv(file_path):
+    df = pd.read_csv(file_path)
+    data = []
 
+    for _, row in df.iterrows():
+        data.append({
+            "question": str(row.get("question", "")),
+            "answer": str(row.get("answer", ""))
+        })
 
-def normalize_text(s):
-    """Removing articles and punctuation, and standardizing whitespace are all typical text processing steps."""
-    import string, re
-    def remove_articles(text):
-        regex = re.compile(r"\b(a|an|the)\b", re.UNICODE)
-        return re.sub(regex, " ", text)
-    
-    def white_space_fix(text):
-        return " ".join(text.split())
-    
-    def remove_punc(text):
-        exclude = set(string.punctuation)
-        return "".join(ch for ch in text if ch not in exclude)
-    
-    def lower(text):
-        return text.lower()
-    
-    return white_space_fix(remove_articles(remove_punc(lower(s))))
+    return data
 
-def compute_exact_match(prediction, truth):
-    return int(normalize_text(prediction) == normalize_text(truth))
+# ===== Text normalization =====
+def normalize_text(text):
+    if not isinstance(text, str):
+        return ""
 
-def compute_f1(prediction, truth):
-    pred_tokens = normalize_text(prediction).split()
-    truth_tokens = normalize_text(truth).split()
-    if len(pred_tokens) == 0 or len(truth_tokens) == 0:
-        return int(pred_tokens == truth_tokens)
-    
-    common_tokens = set(pred_tokens) & set(truth_tokens)
-    if len(common_tokens) == 0:
-        return 0
-    
-    prec = len(common_tokens) / len(pred_tokens)
-    rec = len(common_tokens) / len(truth_tokens)
-    return 2 * (prec * rec) / (prec + rec)
+    stop_words = {'من', 'الى', 'إلى', 'عن', 'على', 'في', 'حتى'}
+    punctuation = set(string.punctuation) | {'،', '؛', '؟'}
 
+    tokens = [t for t in text.split() if t not in stop_words]
+    text = " ".join(tokens)
+    text = "".join(ch for ch in text if ch not in punctuation)
 
+    return " ".join(text.split())
+
+# ===== BERTScore computation =====
+def compute_bert_score(truth, prediction):
+    truth = normalize_text(truth)
+    prediction = normalize_text(prediction)
+
+    if truth == "" or prediction == "":
+        return 0.0, 0.0, 0.0
+
+    P, R, F1 = scorer.score([prediction], [truth])
+
+    return (
+        float(P.mean().item()),
+        float(R.mean().item()),
+        float(F1.mean().item())
+    )
+
+# ===== Main evaluation loop =====
 def main():
-    Exact_match=[]
-    F1_list=[]
-    for item in eval_data:
-        question=item['question']
-        truth=item['answer']
-        prediction=QA(question)
-        EM=compute_exact_match(prediction, truth)
-        Exact_match.append(EM)
-        F1=compute_f1(prediction, truth)
-        F1_list.append(F1)
-    print("EM",sum(Exact_match)/len(eval_data)*100 )
-    print("F1 = ",sum(F1_list)/len(eval_data)*100)
+    eval_data = load_data_csv("/content/qrcd_test.csv")
 
+   # P_scores, R_scores, F1_scores = [], [], []
+    print(len(eval_data))
+    for item in eval_data[35:50]:
+        question = item["question"]
+        truth = item["answer"]
 
-if __name__=="main":
-  main()
-        
+        prediction = QA(question)
+        prediction = prediction if isinstance(prediction, str) else ""
 
+        p, r, f1 = compute_bert_score(truth, prediction)
+        print(f"Precision: {p}")
+        print(f"Recall:    {r}")
+        print(f"F1 Score:  {f1}")
+    print("length of data = ",len(eval_data))
+
+if __name__ == "__main__":
+    main()

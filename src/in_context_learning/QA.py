@@ -22,6 +22,8 @@ import google.generativeai as genai
 import re
 from huggingface_hub import snapshot_download
 from run import template
+import requests
+import json
 snapshot_download(
     repo_id="SeragAmin/NAMAA-retriever-cosine-final_60-90",
     repo_type="model",
@@ -229,15 +231,47 @@ def predict_Question_rerank_crossencoder(question, model, search_fn, k_retrieve=
 
 def QA(question):
     candiated_passages=predict_Question_rerank_crossencoder(question, model, search_fn=search, k_retrieve=70)
-    genai.configure(api_key="AIzaSyBQYT-wo_y1ZmUbwgWkpwQmcp_z5ZZIkwM")
+    genai.configure(api_key="AIzaSyCgwRAGGmoqadJHNdlchKkMeCaLrYfHqiM")
     model2 = genai.GenerativeModel("gemini-2.5-flash")
     context = "\n".join([f"Passage {i+1}: {p}" for i, p in enumerate(candiated_passages)])
     prompt=template(question,context)
     response = model2.generate_content(prompt)
     return response.text
 
+
+
 # Perprocessing For Answer Format
 
+
+""" def QA_model(question,model2):
+    candiated_passages=predict_Question_rerank_crossencoder(question, model, search_fn=search, k_retrieve=70)
+    context = "\n".join([f"Passage {i+1}: {p}" for i, p in enumerate(candiated_passages)])
+    prompt=template(question,context)
+ 
+    response = requests.post(
+    url="https://openrouter.ai/api/v1/chat/completions",
+    headers={
+        "Authorization": "Bearer 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",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "<YOUR_SITE_URL>", # Optional. Site URL for rankings on openrouter.ai.
+        "X-Title": "<YOUR_SITE_NAME>", # Optional. Site title for rankings on openrouter.ai.
+    },
+    data=json.dumps({
+        "model": model2,
+        "messages": [
+        {
+            "role": "user",
+            "content": prompt
+        }
+        ]
+    })
+    )
+    response.raise_for_status()  
+
+    return response.json()["choices"][0]["message"]["content"]
+    """
+
+   
 
 def clean_and_format(text):
     # Remove patterns like (Passage 4), Passage 4, [Passage 4], etc.
@@ -272,34 +306,22 @@ def clean_and_format(text):
     return text
 
 
-""" 
+
 
 #print(get_relevant_passages("اريد حديث عن عدم التحدث بسوء"))
 Questions=[
  "من هو أول إنسان خلقه الله؟",
  "من هو النبي الذي بنى الكعبة؟",
  "لماذا حرّم الله شرب الخمر في القرآن؟",
- "كيف وصف القرآن العلاقة بين الزوج والزوجة؟",
- "ماذا أمر الله بشأن الأيتام في القرآن؟",
  "ما العقوبة التي ذكرها القرآن للسرقة؟",
  "كيف وصف القرآن يوم القيامة؟",
  "ماذا قال القرآن عن مساعدة الفقراء؟",
  "ماذا قال النبي ﷺ عن النية؟",
  "أي حديث يصف أركان الإسلام؟",
- "ماذا قال النبي ﷺ عن حسن الخلق؟",
  "ما الحديث الذي يصف الإيمان؟",
  "ما هى الدلائل التي تشير بأن الانسان مخير؟",
  "ما هو النبي المعروف بالصبر؟",
- "من هم الملائكة المذكورون فى القرأن",
- "ما هو الإتقان؟",
- "ما هي وصايا الله ورسوله في معاملة الوالدين؟",
- "ما الأعمال التي قد تحجب الرزق؟",
  "ما هي الصفات السلبية لطبيعة النفس الإنسانية؟",
- "ما الحكمة في عدد ركعات كل صلاة بالتحديد؟",
- "لست مقتنعًا بالصلاة، فهل يمكنك أن تذكر لي فوائدها أو الحكمة من أدائها؟",
- "هل يعتبر الاعتراف بالذنب من الأعمال الصالحة؟",
- "هل تدبر القرآن فرض؟",
- "هل للصدقة علاقة بنمو المال؟",
  "ما هي وصايا لقمان لابنه؟",
  "ما هي شجرة الزقوم؟",
  "كم مدة عدة الأرملة؟"
@@ -314,6 +336,7 @@ for question in Questions:
     print("الاجابة : ",answer)
     print("\n\n")
 
- """
 
 
+
+ 
