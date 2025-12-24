@@ -145,22 +145,85 @@ def QA_with_in_context_learning(question):
 
 def QA(question):
     candiated_passages=predict_Question_rerank_crossencoder(question, model, search_fn=search, k_retrieve=70)
-    genai.configure(api_key="AIzaSyBSxWBZjqcuTzMDcmnzjeHwdL9lI4Sz0Bg")
+    genai.configure(api_key="AIzaSyDpwD-joTdMJKf99PTPrdTCyQDClyQuIYk")
     model2 = genai.GenerativeModel("gemini-2.5-flash")
     context = "\n".join([f"Passage {i+1}: {p}" for i, p in enumerate(candiated_passages)])
     prompt = f"""
       You are a question answering system.
       Question: {question}
       Context passages:{context}
-      Give a concise answer using only the information from the passages.
+      Give a concise short answer using only the information from the passages.
      """
     response = model2.generate_content(prompt)
     return response.text
 
+def QA_model(question):
+    candiated_passages=predict_Question_rerank_crossencoder(question, model, search_fn=search, k_retrieve=70)
+    context = "\n".join([f"Passage {i+1}: {p}" for i, p in enumerate(candiated_passages)])
+    prompt = f"""
+        You are a precise question answering system.
 
+        Strict rules:
+        - Answer with ONE sentence only.
+        - Use ONLY information explicitly stated in the context.
+        - Do NOT infer, explain, paraphrase, or add details.
+        Question:
+        {question}
 
+        Context:
+        {context}
+
+        answer:
+        """
+
+    response = requests.post(
+    url="https://openrouter.ai/api/v1/chat/completions",
+    headers={
+        "Authorization": "Bearer API_KEY",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "<YOUR_SITE_URL>", 
+        "X-Title": "<YOUR_SITE_NAME>", 
+    },
+    data=json.dumps({
+        "model": "mistralai/devstral-2512:free",
+        "messages": [
+        {
+            "role": "user",
+            "content": prompt
+        }
+        ]
+    })
+    )
+    response.raise_for_status()  
+  
+    return response.json()["choices"][0]["message"]["content"],candiated_passages
 
    
+def QA_with_in_context_learning_model(question):
+    candiated_passages=predict_Question_rerank_crossencoder(question, model, search_fn=search, k_retrieve=70)
+    context = "\n".join([f"Passage {i+1}: {p}" for i, p in enumerate(candiated_passages)])
+    prompt=template(question,context)
+    response = requests.post(
+    url="https://openrouter.ai/api/v1/chat/completions",
+    headers={
+        "Authorization": "Bearer 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",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "<YOUR_SITE_URL>", 
+        "X-Title": "<YOUR_SITE_NAME>", 
+    },
+    data=json.dumps({
+        "model": "mistralai/devstral-2512:free",
+        "messages": [
+        {
+            "role": "user",
+            "content": prompt
+        }
+        ]
+    })
+    )
+    response.raise_for_status()  
+  
+    return response.json()["choices"][0]["message"]["content"],candiated_passages
 
 def clean_and_format(text):
     # Remove patterns like (Passage 4), Passage 4, [Passage 4], etc.

@@ -1,4 +1,4 @@
-# ===== FIX matplotlib backend (MUST be first) =====
+""" # ===== FIX matplotlib backend (MUST be first) =====
 import os
 os.environ["MPLBACKEND"] = "Agg"
 
@@ -80,3 +80,70 @@ def main():
 
 if __name__ == "__main__":
     main()
+ """
+
+
+
+import os
+from ragas import evaluate
+from ragas.metrics import faithfulness, answer_relevancy,answer_correctness
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+from datasets import Dataset
+import pandas as pd
+from QA import QA_model,QA_with_in_context_learning_model
+
+
+os.environ["GOOGLE_API_KEY"] = "AIzaSyCATU-Rx5oB4GYk60vfSFST8bm4SkXmT_4"
+
+evaluator_llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
+evaluator_embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
+def load_data_csv(file_path):
+    df = pd.read_csv(file_path)
+    data = []
+
+    for _, row in df.iterrows():
+        data.append({
+            "question": str(row.get("question", "")),
+            "answer": str(row.get("answer", "")),     
+        })
+
+    return data
+
+def main():
+    eval_data = load_data_csv("/content/test_dataset_V1.csv")
+    for item in eval_data[13:]:
+        question = item["question"]
+        ground_truth = item["answer"]
+        prediction,context =QA_with_in_context_learning_model(question)
+        prediction = prediction if isinstance(prediction, str) else ""
+        print("Question",question)
+        print("answer",prediction)
+        print("ground_truth",ground_truth)
+        print("context",context)
+        data_samples = {
+       "question":[question],
+       "answer": [prediction],
+       "contexts": [context],
+       "ground_truth": [ground_truth]
+    }
+
+        dataset = Dataset.from_dict(data_samples)
+        result = evaluate(
+        dataset,
+        metrics=[
+            faithfulness,
+            answer_relevancy,
+            answer_correctness
+        ],
+        llm=evaluator_llm,
+        embeddings=evaluator_embeddings
+    )
+
+        print(result)
+
+
+if __name__ == "__main__":
+    main()
+
+
+

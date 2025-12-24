@@ -1,41 +1,23 @@
 import pandas as pd
-import json
+import re
 
-def process__train_dataset():
-    rows = []
+diacritics_pattern = re.compile(r'[\u0617-\u061A\u064B-\u0652\u0670\u06D6-\u06ED]')
 
-    with open("/content/qrcd_v1.1_train.jsonl", "r", encoding="utf-8") as f:
-        for line in f:
-            item = json.loads(line)
-
-            rows.append({
-                "id": item.get("pq_id", ""),
-                "question": item.get("question", ""),
-                "context": item.get("passage", ""),
-                "answer": item["answers"][0]["text"] if item.get("answers") else ""
-            })
-
-    return pd.DataFrame(rows)
-
-df = process__train_dataset()
-df.to_csv("qrcd_train.csv", index=False, encoding="utf-8-sig")
+def remove_diacritics(text):
+    if isinstance(text, str):
+        return re.sub(diacritics_pattern, '', text)
+    return text
 
 
-def process__test_dataset():
-    rows = []
+df = pd.read_csv("/content/train_quqa.csv")
+df["question"] = df["question"].apply(remove_diacritics)
+df["answer"] = df["answer"].apply(remove_diacritics)
 
-    with open("/content/qrcd_v1.1_dev.jsonl", "r", encoding="utf-8") as f:
-        for line in f:
-            item = json.loads(line)
+df = df.sample(n=50, random_state=42)
 
-            rows.append({
-                "id": item.get("pq_id", ""),
-                "question": item.get("question", ""),
-                "context": item.get("passage", ""),
-                "answer": item["answers"][0]["text"] if item.get("answers") else ""
-            })
 
-    return pd.DataFrame(rows)
-
-df_test = process__test_dataset()
-df_test.to_csv("qrcd_test.csv", index=False, encoding="utf-8-sig")
+df[["question", "answer"]].to_csv(
+    "test_dataset_V1.csv",
+    index=False,
+    encoding="utf-8-sig"
+)
